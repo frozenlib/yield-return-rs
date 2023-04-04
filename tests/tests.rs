@@ -20,6 +20,18 @@ fn values() {
 }
 
 #[test]
+fn values_with_lifetime() {
+    let items = vec![1, 2];
+    let items = &items;
+    let iter = Yield::new(|mut y| async move {
+        y.ret(&items[0]).await;
+        y.ret(&items[1]).await;
+    });
+    let list: Vec<_> = iter.collect();
+    assert_eq!(list, vec![&1, &2]);
+}
+
+#[test]
 #[allow(unused_must_use)]
 #[should_panic]
 fn no_await_1() {

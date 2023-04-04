@@ -53,7 +53,7 @@ struct RawIter<'a, T> {
 
 pub struct Yield<'a, T>(Option<RawIter<'a, T>>);
 
-impl<'a, T> Yield<'a, T> {
+impl<'a, T: 'a> Yield<'a, T> {
     pub fn new<Fut: Future<Output = ()> + 'a>(f: impl FnOnce(YieldContext<T>) -> Fut) -> Self {
         let value = Rc::new(RefCell::new(None));
         let cx = YieldContext(ValueStore(value.clone()));
