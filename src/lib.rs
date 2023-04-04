@@ -17,10 +17,7 @@ impl<T> ValueStore<T> {
     #[track_caller]
     fn set(&self, value: T) {
         let mut b = self.0.borrow_mut();
-        assert!(
-            b.is_none(),
-            "The result of the previous `ret` is not await."
-        );
+        assert!(b.is_none(), "The result of `ret` is not await.");
         *b = Some(value);
     }
 }
@@ -45,13 +42,13 @@ impl<T> YieldContext<T> {
     }
 }
 
-struct RawIter<'a, T> {
+struct RawYield<'a, T> {
     value: Rc<RefCell<Option<T>>>,
     fut: Pin<Box<dyn Future<Output = ()> + 'a>>,
     waker: Waker,
 }
 
-pub struct Yield<'a, T>(Option<RawIter<'a, T>>);
+pub struct Yield<'a, T>(Option<RawYield<'a, T>>);
 
 impl<'a, T: 'a> Yield<'a, T> {
     pub fn new<Fut: Future<Output = ()> + 'a>(f: impl FnOnce(YieldContext<T>) -> Fut) -> Self {
@@ -59,7 +56,7 @@ impl<'a, T: 'a> Yield<'a, T> {
         let cx = YieldContext(ValueStore(value.clone()));
         let fut = Box::pin(f(cx));
         let waker = Arc::new(FakeWake).into();
-        Self(Some(RawIter { value, fut, waker }))
+        Self(Some(RawYield { value, fut, waker }))
     }
 }
 impl<T> Iterator for Yield<'_, T> {
