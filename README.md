@@ -34,6 +34,8 @@ The code is short, with only one file, `lib.rs`. You can copy and paste the cont
 | `Iterator` support         | ✔               | ✔          |
 | `Generator` support        |                 | ✔          |
 | no-dependencies            | ✔               |            |
+| no-macros                  | ✔               |            |
+| safe code only             | ✔               |            |
 | `lib.rs` only              | ✔               |            |
 | number of public types     | 2               | many       |
 
