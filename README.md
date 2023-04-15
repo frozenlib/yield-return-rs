@@ -1,5 +1,7 @@
 # yield-return-rs
 
+[![Actions Status](https://github.com/frozenlib/yield-return-rs/workflows/CI/badge.svg)](https://github.com/frozenlib/yield-return-rs/actions)
+
 Implement a coroutine like C#'s `yield return` using Rust's `async`, `await`.
 
 ## Exmaple
