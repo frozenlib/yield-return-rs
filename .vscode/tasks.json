@@ -2,6 +2,17 @@
   // See https://go.microsoft.com/fwlink/?LinkId=733558
   // for the documentation about the tasks.json format
   "version": "2.0.0",
+  "options": {
+    "env": {
+      // "RUST_BACKTRACE": "1",
+      // "RUSTFLAGS": "--cfg procmacro2_semver_exempt",
+      // "CARGO_TARGET_DIR": "Z:/temporary/target_dirs/${workspaceFolderBasename}/target/",
+    },
+  },
+  "presentation": {
+    "panel": "dedicated",
+    "clear": true,
+  },
   "tasks": [
     {
       "type": "shell",
@@ -13,15 +24,6 @@
       "problemMatcher": [
         "$rustc"
       ],
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      }
-      // "options": {
-      //     "env": {
-      //         "RUST_BACKTRACE": "1",
-      //     }
-      // }
     },
     {
       "type": "shell",
@@ -34,10 +36,6 @@
       "problemMatcher": [
         "$rustc"
       ],
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      }
     },
     {
       "type": "shell",
@@ -53,17 +51,13 @@
         "kind": "build",
         "isDefault": true
       },
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      },
       "dependsOn": [
         "include doc"
       ],
     },
     {
       "type": "shell",
-      "label": "cargo watch",
+      "label": "cargo watch test",
       "command": "wt",
       "args": [
         "new-tab",
@@ -73,10 +67,19 @@
         "test"
       ],
       "problemMatcher": [],
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      }
+    },
+    {
+      "type": "shell",
+      "label": "cargo watch run",
+      "command": "wt",
+      "args": [
+        "new-tab",
+        "cargo-watch",
+        "-c",
+        "-x",
+        "run",
+      ],
+      "problemMatcher": [],
     },
     {
       "type": "shell",
@@ -90,10 +93,6 @@
       "problemMatcher": [
         "$rustc"
       ],
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      }
     },
     {
       "type": "shell",
@@ -108,10 +107,6 @@
       "problemMatcher": [
         "$rustc"
       ],
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      },
       "dependsOn": [
         "include doc"
       ],
@@ -132,10 +127,6 @@
       "problemMatcher": [
         "$rustc"
       ],
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      }
     },
     {
       "type": "shell",
@@ -156,10 +147,6 @@
       "problemMatcher": [
         "$rustc"
       ],
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      }
     },
     {
       "type": "shell",
@@ -168,10 +155,6 @@
       "problemMatcher": [
         "$rustc"
       ],
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true,
-      }
     },
     {
       "type": "shell",
@@ -186,10 +169,6 @@
       "problemMatcher": [
         "$rustc"
       ],
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      }
     },
     {
       "type": "shell",
@@ -204,10 +183,6 @@
       "problemMatcher": [
         "$rustc"
       ],
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      }
     },
     {
       "type": "shell",
@@ -223,13 +198,9 @@
       "problemMatcher": [
         "$rustc"
       ],
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      },
       "options": {
         "env": {
-          "TRYBUILD": "overwrite"
+          "TRYBUILD": "overwrite",
         }
       }
     },
@@ -262,10 +233,6 @@
           ]
         },
       ],
-      "presentation": {
-        "panel": "dedicated",
-        "clear": true
-      }
     },
   ]
 }
