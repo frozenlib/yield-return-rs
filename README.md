@@ -14,6 +14,27 @@ let list: Vec<_> = iter.collect();
 assert_eq!(list, vec![1, 2]);
 ```
 
+## Compare with [`genawaiter`](https://github.com/whatisaphone/genawaiter)
+
+`genawaiter` already exists as a crate with the same purpose as this `yield-return-rs`.
+
+Compared to `genawaiter`, `yield-return-rs` is very simple.
+
+No dependencies, no macros, no unsafe code.
+
+The code is short, with only one file, `lib.rs`. You can copy and paste the contents of `lib.rs` and use it as is.
+
+|                            | yield-return-rs | genawaiter |
+| -------------------------- | --------------- | ---------- |
+| `Rc` based implementation  | ✔               | ✔          |
+| stack based implementation |                 | ✔          |
+| `Sync` implementation      |                 | ✔          |
+| `Iterator` support         | ✔               | ✔          |
+| `Generator` support        |                 | ✔          |
+| no-dependencies            | ✔               |            |
+| `lib.rs` only              | ✔               |            |
+| number of public types     | 2               | many       |
+
 ## License
 
 This project is dual licensed under Apache-2.0/MIT. See the two LICENSE-\* files for details.
