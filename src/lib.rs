@@ -1,4 +1,6 @@
-#![doc = include_str!("../README.md")]
+//! This crate provides a way to implement something like C#'s `yield return` using an asynchronous function.
+//!
+//! See [`Yield::new`] for details.
 use std::{
     cell::RefCell,
     future::Future,
@@ -33,9 +35,11 @@ impl<T> Future for ValueStore<T> {
     }
 }
 
+/// A context for asynchronous function to implement iterator.
 pub struct YieldContext<T>(ValueStore<T>);
 
 impl<T> YieldContext<T> {
+    /// Return a value. Equivalent to `yield return` in C#.
     #[track_caller]
     pub fn ret(&mut self, value: T) -> impl Future<Output = ()> + '_ {
         self.0.set(value);
@@ -49,9 +53,22 @@ struct RawYield<'a, T> {
     waker: Waker,
 }
 
+/// An iterator implemented by asynchronous function.
 pub struct Yield<'a, T>(Option<RawYield<'a, T>>);
 
 impl<'a, T: 'a> Yield<'a, T> {
+    /// Create an iterator from an asynchronous function.
+    ///
+    /// # Example
+    /// ```
+    /// use yield_return::Yield;
+    /// let iter = Yield::new(|mut y| async move {
+    ///     y.ret(1).await;
+    ///     y.ret(2).await;
+    /// });
+    /// let list: Vec<_> = iter.collect();
+    /// assert_eq!(list, vec![1, 2]);
+    /// ```
     pub fn new<Fut: Future<Output = ()> + 'a>(f: impl FnOnce(YieldContext<T>) -> Fut) -> Self {
         let value = Rc::new(RefCell::new(None));
         let cx = YieldContext(ValueStore(value.clone()));
