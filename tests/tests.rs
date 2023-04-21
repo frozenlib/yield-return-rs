@@ -20,6 +20,18 @@ fn values() {
 }
 
 #[test]
+fn fused() {
+    let mut iter = Yield::new(|mut y| async move {
+        y.ret(1).await;
+        y.ret(2).await;
+    });
+    assert_eq!(iter.next(), Some(1));
+    assert_eq!(iter.next(), Some(2));
+    assert_eq!(iter.next(), None);
+    assert_eq!(iter.next(), None);
+}
+
+#[test]
 fn values_with_lifetime() {
     let items = vec![1, 2];
     let items = &items;

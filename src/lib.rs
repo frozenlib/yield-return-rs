@@ -4,6 +4,7 @@
 use std::{
     cell::RefCell,
     future::Future,
+    iter::FusedIterator,
     pin::Pin,
     rc::Rc,
     sync::Arc,
@@ -102,6 +103,7 @@ impl<T> Iterator for Yield<'_, T> {
         }
     }
 }
+impl<T> FusedIterator for Yield<'_, T> {}
 struct FakeWake;
 impl Wake for FakeWake {
     fn wake(self: Arc<Self>) {}
