@@ -1,5 +1,7 @@
 # yield-return-rs
 
+[![Crates.io](https://img.shields.io/crates/v/yield-return.svg)](https://crates.io/crates/yield-return)
+[![Docs.rs](https://docs.rs/yield-return/badge.svg)](https://docs.rs/yield-return/)
 [![Actions Status](https://github.com/frozenlib/yield-return-rs/workflows/CI/badge.svg)](https://github.com/frozenlib/yield-return-rs/actions)
 
 Implement a coroutine like C#'s `yield return` using Rust's `async`, `await`.
