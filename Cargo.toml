@@ -5,10 +5,10 @@ edition = "2021"
 authors = ["frozenlib <frozenlib@users.noreply.github.com>"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/frozenlib/yield-return-rs"
-# documentation = "https://docs.rs/yield-return/"
+documentation = "https://docs.rs/yield-return/"
 keywords = ["yield", "yield-return", "iterator", "generator", "coroutine"]
-categories = [""]
-description = ""
+categories = ["rust-patterns"]
+description = "Implement a coroutine like C#'s `yield return` using Rust's `async`, `await`."
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
