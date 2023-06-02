@@ -7,7 +7,7 @@ use std::{
     iter::FusedIterator,
     pin::Pin,
     rc::Rc,
-    sync::Arc,
+    sync::{Arc, OnceLock},
     task::{
         Context,
         Poll::{self, Pending, Ready},
@@ -74,7 +74,8 @@ impl<'a, T: 'a> Yield<'a, T> {
         let value = Rc::new(RefCell::new(None));
         let cx = YieldContext(ValueStore(value.clone()));
         let fut = Box::pin(f(cx));
-        let waker = Arc::new(FakeWake).into();
+        static WAKER: OnceLock<Arc<FakeWake>> = OnceLock::new();
+        let waker = WAKER.get_or_init(|| Arc::new(FakeWake)).clone().into();
         Self(Some(RawYield { value, fut, waker }))
     }
 }
