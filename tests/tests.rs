@@ -20,6 +20,15 @@ fn values() {
 }
 
 #[test]
+fn values_ret_iter() {
+    let iter = Yield::new(|mut y| async move {
+        y.ret_iter([1, 2]).await;
+    });
+    let list: Vec<_> = iter.collect();
+    assert_eq!(list, vec![1, 2]);
+}
+
+#[test]
 fn fused() {
     let mut iter = Yield::new(|mut y| async move {
         y.ret(1).await;
