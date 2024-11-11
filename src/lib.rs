@@ -40,11 +40,18 @@ impl<T> Future for ValueStore<T> {
 pub struct YieldContext<T>(ValueStore<T>);
 
 impl<T> YieldContext<T> {
-    /// Return a value. Equivalent to `yield return` in C#.
+    /// Yields a single value. Similar to C#'s `yield return` or Python's `yield`.
     #[track_caller]
     pub fn ret(&mut self, value: T) -> impl Future<Output = ()> + '_ {
         self.0.set(value);
         &mut self.0
+    }
+
+    /// Yields all values from an iterator. Similar to Python's `yield from` or JavaScript's `yield*`.
+    pub async fn ret_iter(&mut self, iter: impl IntoIterator<Item = T>) {
+        for value in iter {
+            self.ret(value).await;
+        }
     }
 }
 
