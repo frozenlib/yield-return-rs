@@ -35,6 +35,17 @@ The following table shows the available types:
 [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
 [`Stream`]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html
 
+## Compare with other crates
+
+While [async-stream] and [genawaiter] serve similar purposes, [yield-return] focuses on usability over performance. This design philosophy is reflected in two key characteristics:
+
+- Type parameters only expose the external interface, not implementation details
+- Clean API using only types and functions (no macros)
+
+[async-stream]: https://crates.io/crates/async-stream
+[genawaiter]: https://crates.io/crates/genawaiter
+[yield-return]: https://crates.io/crates/yield-return
+
 ## License
 
 This project is dual licensed under Apache-2.0/MIT. See the two LICENSE-\* files for details.
