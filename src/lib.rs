@@ -1,9 +1,12 @@
 //! This crate provides a way to implement something like C#'s `yield return` using an asynchronous function.
 //!
-//! See [`LocalIter::new`] for details.
+//! See [`Iter::new`] for details.
 
+mod iter;
 mod local_iter;
+mod utils;
 
+pub use iter::{Iter, IterContext};
 pub use local_iter::{LocalIter, LocalIterContext};
 
 #[deprecated(since = "0.2.0", note = "Use `LocalIter` instead.")]
