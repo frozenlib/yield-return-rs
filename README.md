@@ -6,7 +6,7 @@
 
 Implement a coroutine like C#'s `yield return` using Rust's `async`, `await`.
 
-## Exmaple
+## Example
 
 ```rust
 use yield_return::Iter;
