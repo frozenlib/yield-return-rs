@@ -33,7 +33,9 @@ impl<T> Future for Sender<T> {
     }
 }
 
-/// A context for asynchronous function to implement iterator.
+/// `Send` iterator context.
+///
+/// This type implements `Send`.
 pub struct IterContext<T>(Sender<T>);
 
 impl<T> IterContext<T>
@@ -85,13 +87,16 @@ impl<T> Data<'_, T> {
     }
 }
 
-/// An iterator implemented by asynchronous function.
+/// `Send` iterator implemented using async functions.
+///
+/// This type implements `Send`.
 pub struct Iter<'a, T>(Data<'a, T>);
 
 impl<'a, T: 'a + Send> Iter<'a, T> {
     /// Create an iterator from an asynchronous function.
     ///
     /// # Example
+    ///
     /// ```
     /// use yield_return::Yield;
     /// let iter = Yield::new(|mut y| async move {
@@ -124,6 +129,9 @@ impl<T> Iterator for Iter<'_, T> {
 }
 impl<T> FusedIterator for Iter<'_, T> {}
 
+/// `Send` stream context.
+///
+/// This type implements `Send`.
 pub struct AsyncIterContext<T>(IterContext<T>);
 impl<T> Deref for AsyncIterContext<T> {
     type Target = IterContext<T>;
@@ -137,7 +145,9 @@ impl<T> DerefMut for AsyncIterContext<T> {
     }
 }
 
-/// A stream implemented by asynchronous function.
+/// `Send` stream implemented using async functions.
+///
+/// This type implements `Send`.
 pub struct AsyncIter<'a, T>(Iter<'a, T>);
 
 impl<'a, T: Send + 'a> AsyncIter<'a, T> {

@@ -34,7 +34,9 @@ impl<T> Future for Sender<T> {
     }
 }
 
-/// A context for asynchronous function to implement iterator.
+/// Non-`Send` iterator context.
+///
+/// This type does not implement `Send`.
 pub struct LocalIterContext<T>(Sender<T>);
 
 impl<T> LocalIterContext<T> {
@@ -83,7 +85,9 @@ impl<T> Data<'_, T> {
     }
 }
 
-/// An iterator implemented by asynchronous function.
+/// Non-`Send` iterator implemented using async functions.
+///
+/// This type does not implement `Send`.
 pub struct LocalIter<'a, T>(Data<'a, T>);
 
 impl<'a, T: 'a> LocalIter<'a, T> {
@@ -120,6 +124,9 @@ impl<T> Iterator for LocalIter<'_, T> {
 }
 impl<T> FusedIterator for LocalIter<'_, T> {}
 
+/// Non-`Send` stream context.
+///
+/// This type does not implement `Send`.
 pub struct LocalAsyncIterContext<T>(LocalIterContext<T>);
 impl<T> Deref for LocalAsyncIterContext<T> {
     type Target = LocalIterContext<T>;
@@ -133,7 +140,9 @@ impl<T> DerefMut for LocalAsyncIterContext<T> {
     }
 }
 
-/// A stream implemented by asynchronous function.
+/// Non-`Send` stream implemented using async functions.
+///
+/// This type does not implement `Send`.
 pub struct LocalAsyncIter<'a, T>(LocalIter<'a, T>);
 
 impl<'a, T: 'a> LocalAsyncIter<'a, T> {

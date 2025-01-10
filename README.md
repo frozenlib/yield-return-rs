@@ -9,8 +9,8 @@ Implement a coroutine like C#'s `yield return` using Rust's `async`, `await`.
 ## Exmaple
 
 ```rust
-use yield_return::Yield;
-let iter = Yield::new(|mut y| async move {
+use yield_return::Iter;
+let iter = Iter::new(|mut y| async move {
     y.ret(1).await;
     y.ret(2).await;
 });
@@ -18,28 +18,22 @@ let list: Vec<_> = iter.collect();
 assert_eq!(list, vec![1, 2]);
 ```
 
-## Compare with [`genawaiter`](https://github.com/whatisaphone/genawaiter)
+## Available Types
 
-`genawaiter` already exists as a crate with the same purpose as this `yield-return-rs`.
+This crate provides several iterator types that differ based on two characteristics:
 
-Compared to `genawaiter`, `yield-return-rs` is very simple.
+- Whether they implement `Iterator` or `Stream`
+- Whether they require and implement `Send`
 
-No dependencies, no macros, no unsafe code.
+The following table shows the available types:
 
-The code is short, with only one file, `lib.rs`. You can copy and paste the contents of `lib.rs` and use it as is.
+|              | `Send`      | Not `Send`       |
+| ------------ | ----------- | ---------------- |
+| [`Iterator`] | `Iter`      | `LocalIter`      |
+| [`Stream`]   | `AsyncIter` | `LocalAsyncIter` |
 
-|                            | yield-return-rs | genawaiter |
-| -------------------------- | --------------- | ---------- |
-| `Rc` based implementation  | ✔               | ✔          |
-| stack based implementation |                 | ✔          |
-| `Sync` implementation      |                 | ✔          |
-| `Iterator` support         | ✔               | ✔          |
-| `Generator` support        |                 | ✔          |
-| no-dependencies            | ✔               |            |
-| no-macros                  | ✔               |            |
-| safe code only             | ✔               |            |
-| `lib.rs` only              | ✔               |            |
-| number of public types     | 2               | many       |
+[`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
+[`Stream`]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html
 
 ## License
 
