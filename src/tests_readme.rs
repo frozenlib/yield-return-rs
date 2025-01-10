@@ -23,18 +23,23 @@
 //!
 //! This crate provides several iterator types that differ based on two characteristics:
 //!
-//! - Whether they implement `Iterator` or `Stream`
-//! - Whether they require and implement `Send`
+//! - Whether they implement [`Iterator`] or [`Stream`]
+//! - Whether they require and implement [`Send`]
 //!
 //! The following table shows the available types:
 //!
-//! |              | `Send`      | Not `Send`       |
-//! | ------------ | ----------- | ---------------- |
-//! | [`Iterator`] | `Iter`      | `LocalIter`      |
-//! | [`Stream`]   | `AsyncIter` | `LocalAsyncIter` |
+//! |              | `Send`        | Not `Send`         |
+//! | ------------ | ------------- | ------------------ |
+//! | [`Iterator`] | [`Iter`]      | [`LocalIter`]      |
+//! | [`Stream`]   | [`AsyncIter`] | [`LocalAsyncIter`] |
 //!
 //! [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
 //! [`Stream`]: https://docs.rs/futures/latest/futures/stream/trait.Stream.html
+//! [`Send`]: https://doc.rust-lang.org/std/marker/trait.Send.html
+//! [`Iter`]: https://docs.rs/yield-return/latest/yield_return/struct.Iter.html
+//! [`LocalIter`]: https://docs.rs/yield-return/latest/yield_return/struct.LocalIter.html
+//! [`AsyncIter`]: https://docs.rs/yield-return/latest/yield_return/struct.AsyncIter.html
+//! [`LocalAsyncIter`]: https://docs.rs/yield-return/latest/yield_return/struct.LocalAsyncIter.html
 //!
 //! ## Compare with other crates
 //!
