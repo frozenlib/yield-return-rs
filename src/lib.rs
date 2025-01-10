@@ -6,8 +6,8 @@ mod iter;
 mod local_iter;
 mod utils;
 
-pub use iter::{Iter, IterContext};
-pub use local_iter::{LocalIter, LocalIterContext};
+pub use iter::{AsyncIter, AsyncIterContext, Iter, IterContext};
+pub use local_iter::{LocalAsyncIter, LocalAsyncIterContext, LocalIter, LocalIterContext};
 
 #[deprecated(since = "0.2.0", note = "Use `LocalIter` instead.")]
 pub type Yield<'a, T> = LocalIter<'a, T>;

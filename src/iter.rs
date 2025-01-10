@@ -1,12 +1,15 @@
 use std::{
     future::Future,
     iter::FusedIterator,
+    ops::{Deref, DerefMut},
     pin::Pin,
     sync::{Arc, Mutex},
-    task::{Context, Poll, Waker},
+    task::{Context, Poll},
 };
 
-use crate::utils::fake_waker;
+use futures_core::{FusedStream, Stream};
+
+use crate::utils::noop_waker;
 
 struct Sender<T>(Arc<Mutex<Option<T>>>);
 
@@ -54,12 +57,36 @@ where
 
 struct Data<'a, T> {
     value: Arc<Mutex<Option<T>>>,
-    fut: Pin<Box<dyn Future<Output = ()> + Send + 'a>>,
-    waker: Waker,
+    fut: Option<Pin<Box<dyn Future<Output = ()> + Send + Sync + 'a>>>,
+}
+impl<T> Data<'_, T> {
+    fn poll_next(&mut self, cx: &mut Context) -> Poll<Option<T>> {
+        let Some(fut) = &mut self.fut else {
+            return Poll::Ready(None);
+        };
+        let poll = fut.as_mut().poll(cx);
+        match poll {
+            Poll::Ready(_) => {
+                assert!(
+                    self.value.lock().unwrap().is_none(),
+                    "The result of `ret` is not await."
+                );
+                self.fut = None;
+                Poll::Ready(None)
+            }
+            Poll::Pending => {
+                if let Some(value) = self.value.lock().unwrap().take() {
+                    Poll::Ready(Some(value))
+                } else {
+                    Poll::Pending
+                }
+            }
+        }
+    }
 }
 
 /// An iterator implemented by asynchronous function.
-pub struct Iter<'a, T>(Option<Data<'a, T>>);
+pub struct Iter<'a, T>(Data<'a, T>);
 
 impl<'a, T: 'a + Send> Iter<'a, T> {
     /// Create an iterator from an asynchronous function.
@@ -74,14 +101,14 @@ impl<'a, T: 'a + Send> Iter<'a, T> {
     /// let list: Vec<_> = iter.collect();
     /// assert_eq!(list, vec![1, 2]);
     /// ```
-    pub fn new<Fut: Future<Output = ()> + Send + 'a>(
-        f: impl FnOnce(IterContext<T>) -> Fut + Send,
+    pub fn new<Fut: Future<Output = ()> + Send + Sync + 'a>(
+        f: impl FnOnce(IterContext<T>) -> Fut,
     ) -> Self {
         let value = Arc::new(Mutex::new(None));
         let cx = IterContext(Sender(value.clone()));
-        let fut = Box::pin(f(cx));
-        let waker = fake_waker();
-        Self(Some(Data { value, fut, waker }))
+        let fut: Pin<Box<dyn Future<Output = ()> + Send + Sync + 'a>> = Box::pin(f(cx));
+        let fut = Some(fut);
+        Self(Data { value, fut })
     }
 }
 
@@ -89,25 +116,48 @@ impl<T> Iterator for Iter<'_, T> {
     type Item = T;
     #[track_caller]
     fn next(&mut self) -> Option<Self::Item> {
-        let raw = self.0.as_mut()?;
-        let poll = raw.fut.as_mut().poll(&mut Context::from_waker(&raw.waker));
-        match poll {
-            Poll::Ready(_) => {
-                assert!(
-                    raw.value.lock().unwrap().is_none(),
-                    "The result of `ret` is not await."
-                );
-                self.0 = None;
-                None
-            }
-            Poll::Pending => {
-                if let Some(value) = raw.value.lock().unwrap().take() {
-                    Some(value)
-                } else {
-                    panic!("`YieldContext::ret` is not called.");
-                }
-            }
+        match self.0.poll_next(&mut Context::from_waker(&noop_waker())) {
+            Poll::Ready(value) => value,
+            Poll::Pending => panic!("`YieldContext::ret` is not called."),
         }
     }
 }
 impl<T> FusedIterator for Iter<'_, T> {}
+
+pub struct AsyncIterContext<T>(IterContext<T>);
+impl<T> Deref for AsyncIterContext<T> {
+    type Target = IterContext<T>;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+impl<T> DerefMut for AsyncIterContext<T> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
+
+/// A stream implemented by asynchronous function.
+pub struct AsyncIter<'a, T>(Iter<'a, T>);
+
+impl<'a, T: Send + 'a> AsyncIter<'a, T> {
+    /// Create a stream from an asynchronous function.
+    pub fn new<Fut: Future<Output = ()> + Send + Sync + 'a>(
+        f: impl FnOnce(AsyncIterContext<T>) -> Fut + Send + Sync,
+    ) -> Self {
+        Self(Iter::new(|cx| f(AsyncIterContext(cx))))
+    }
+}
+
+impl<T> Stream for AsyncIter<'_, T> {
+    type Item = T;
+
+    fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
+        self.0 .0.poll_next(cx)
+    }
+}
+impl<T> FusedStream for AsyncIter<'_, T> {
+    fn is_terminated(&self) -> bool {
+        self.0 .0.fut.is_none()
+    }
+}

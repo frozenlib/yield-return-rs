@@ -3,13 +3,14 @@ use std::{
     task::{Wake, Waker},
 };
 
-struct FakeWake;
-impl Wake for FakeWake {
+struct NoopWake;
+impl Wake for NoopWake {
     fn wake(self: Arc<Self>) {}
     fn wake_by_ref(self: &Arc<Self>) {}
 }
 
-pub fn fake_waker() -> Waker {
-    static WAKER: OnceLock<Arc<FakeWake>> = OnceLock::new();
-    WAKER.get_or_init(|| Arc::new(FakeWake)).clone().into()
+// TODO: Remove this function when `std::task::Waker::noop` is stabilized.
+pub fn noop_waker() -> Waker {
+    static WAKER: OnceLock<Arc<NoopWake>> = OnceLock::new();
+    WAKER.get_or_init(|| Arc::new(NoopWake)).clone().into()
 }

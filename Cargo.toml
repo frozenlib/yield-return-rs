@@ -14,3 +14,8 @@ description = "Implement a coroutine like C#'s `yield return` using Rust's `asyn
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+futures-core = "0.3.31"
+
+[dev-dependencies]
+futures = "0.3.31"
+rt-local = "0.1.4"
