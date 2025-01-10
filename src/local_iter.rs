@@ -147,6 +147,19 @@ pub struct LocalAsyncIter<'a, T>(LocalIter<'a, T>);
 
 impl<'a, T: 'a> LocalAsyncIter<'a, T> {
     /// Create a stream from an asynchronous function.
+    ///
+    /// # Example
+    /// ```
+    /// use yield_return::LocalAsyncIter;
+    /// # futures::executor::block_on(async {
+    /// let iter = LocalAsyncIter::new(|mut y| async move {
+    ///     y.ret(1).await;
+    ///     y.ret(2).await;
+    /// });
+    /// let list: Vec<_> = futures::StreamExt::collect(iter).await;
+    /// assert_eq!(list, vec![1, 2]);
+    /// # });
+    /// ```
     pub fn new<Fut: Future<Output = ()> + 'a>(
         f: impl FnOnce(LocalAsyncIterContext<T>) -> Fut,
     ) -> Self {

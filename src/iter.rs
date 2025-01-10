@@ -152,6 +152,19 @@ pub struct AsyncIter<'a, T>(Iter<'a, T>);
 
 impl<'a, T: Send + 'a> AsyncIter<'a, T> {
     /// Create a stream from an asynchronous function.
+    ///
+    /// # Example
+    /// ```
+    /// use yield_return::AsyncIter;
+    /// # futures::executor::block_on(async {
+    /// let iter = AsyncIter::new(|mut y| async move {
+    ///     y.ret(1).await;
+    ///     y.ret(2).await;
+    /// });
+    /// let list: Vec<_> = futures::StreamExt::collect(iter).await;
+    /// assert_eq!(list, vec![1, 2]);
+    /// # });
+    /// ```
     pub fn new<Fut: Future<Output = ()> + Send + Sync + 'a>(
         f: impl FnOnce(AsyncIterContext<T>) -> Fut + Send + Sync,
     ) -> Self {
