@@ -42,7 +42,7 @@ pub struct LocalIterContext<T>(Sender<T>);
 impl<T> LocalIterContext<T> {
     /// Yields a single value. Similar to C#'s `yield return` or Python's `yield`.
     #[track_caller]
-    pub fn ret(&mut self, value: T) -> impl Future<Output = ()> + '_ {
+    pub fn ret(&mut self, value: T) -> impl Future<Output = ()> {
         self.0.set(value);
         &mut self.0
     }
@@ -171,11 +171,11 @@ impl<T> Stream for LocalAsyncIter<'_, T> {
     type Item = T;
 
     fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-        self.0 .0.poll_next(cx)
+        self.0.0.poll_next(cx)
     }
 }
 impl<T> FusedStream for LocalAsyncIter<'_, T> {
     fn is_terminated(&self) -> bool {
-        self.0 .0.fut.is_none()
+        self.0.0.fut.is_none()
     }
 }
