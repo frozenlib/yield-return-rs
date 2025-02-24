@@ -3,12 +3,12 @@ use std::{
     future::Future,
     iter::FusedIterator,
     ops::{Deref, DerefMut},
-    pin::Pin,
+    pin::{Pin, pin},
     rc::Rc,
     task::{Context, Poll},
 };
 
-use futures_core::{FusedStream, Stream};
+use futures::{Stream, StreamExt, stream::FusedStream};
 
 use crate::utils::noop_waker;
 
@@ -128,6 +128,16 @@ impl<T> FusedIterator for LocalIter<'_, T> {}
 ///
 /// This type does not implement `Send`.
 pub struct LocalAsyncIterContext<T>(LocalIterContext<T>);
+
+impl<T> LocalAsyncIterContext<T> {
+    /// Yields all values from a stream.
+    pub async fn ret_stream(&mut self, stream: impl Stream<Item = T>) {
+        let mut stream = pin!(stream);
+        while let Some(value) = stream.next().await {
+            self.0.ret(value).await;
+        }
+    }
+}
 impl<T> Deref for LocalAsyncIterContext<T> {
     type Target = LocalIterContext<T>;
     fn deref(&self) -> &Self::Target {

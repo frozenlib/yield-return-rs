@@ -26,7 +26,7 @@
 //! | [`Iterator`] | [`Iter`]      | [`LocalIter`]      |
 //! | [`Stream`]   | [`AsyncIter`] | [`LocalAsyncIter`] |
 //!
-//! [`Stream`]: futures_core::stream::Stream
+//! [`Stream`]: futures::stream::Stream
 
 mod iter;
 mod local_iter;
