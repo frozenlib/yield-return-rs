@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use futures::StreamExt;
+use futures::{StreamExt, stream};
 use rt_local::runtime::core::test;
 use utils::sleep;
 use yield_return::AsyncIter;
@@ -28,6 +28,15 @@ async fn values() {
 async fn values_ret_iter() {
     let iter = AsyncIter::new(|mut y| async move {
         y.ret_iter([1, 2]).await;
+    });
+    let list: Vec<_> = iter.collect().await;
+    assert_eq!(list, vec![1, 2]);
+}
+
+#[test]
+async fn values_ret_stream() {
+    let iter = AsyncIter::new(|mut y| async move {
+        y.ret_stream(stream::iter([1, 2])).await;
     });
     let list: Vec<_> = iter.collect().await;
     assert_eq!(list, vec![1, 2]);
