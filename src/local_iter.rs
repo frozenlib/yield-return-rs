@@ -5,12 +5,10 @@ use std::{
     ops::{Deref, DerefMut},
     pin::{Pin, pin},
     rc::Rc,
-    task::{Context, Poll},
+    task::{Context, Poll, Waker},
 };
 
 use futures::{Stream, StreamExt, stream::FusedStream};
-
-use crate::utils::noop_waker;
 
 struct Sender<T>(Rc<RefCell<Option<T>>>);
 
@@ -116,7 +114,7 @@ impl<T> Iterator for LocalIter<'_, T> {
     type Item = T;
     #[track_caller]
     fn next(&mut self) -> Option<Self::Item> {
-        match self.0.poll_next(&mut Context::from_waker(&noop_waker())) {
+        match self.0.poll_next(&mut Context::from_waker(Waker::noop())) {
             Poll::Ready(value) => value,
             Poll::Pending => panic!("`YieldContext::ret` is not called."),
         }

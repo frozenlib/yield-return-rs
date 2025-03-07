@@ -30,7 +30,6 @@
 
 mod iter;
 mod local_iter;
-mod utils;
 
 #[cfg(doctest)]
 mod tests_readme;
