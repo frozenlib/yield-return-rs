@@ -1,4 +1,4 @@
-use std::{future::pending, ptr::null};
+use std::{cell::Cell, future::pending, ptr::null};
 
 use yield_return::LocalIter;
 
@@ -97,4 +97,13 @@ fn check_not_send() {
     });
     let list: Vec<_> = iter.collect();
     assert_eq!(list, vec![1, 2]);
+}
+
+#[test]
+fn ret_not_sync() {
+    let iter = LocalIter::new(|mut y| async move {
+        y.ret(Cell::new(1)).await;
+    });
+    let list: Vec<_> = iter.collect();
+    assert_eq!(list, vec![Cell::new(1)]);
 }

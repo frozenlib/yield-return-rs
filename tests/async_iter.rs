@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{cell::Cell, time::Duration};
 
 use futures::{StreamExt, stream};
 use rt_local::runtime::core::test;
@@ -105,4 +105,13 @@ fn check_send() {
     });
     fn f(_: impl Send) {}
     f(iter);
+}
+
+#[test]
+async fn ret_not_sync() {
+    let iter = AsyncIter::new(|mut y| async move {
+        y.ret(Cell::new(1)).await;
+    });
+    let list: Vec<_> = iter.collect().await;
+    assert_eq!(list, vec![Cell::new(1)]);
 }

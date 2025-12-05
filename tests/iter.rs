@@ -1,4 +1,4 @@
-use std::future::pending;
+use std::{cell::Cell, future::pending};
 
 use yield_return::Iter;
 
@@ -91,4 +91,13 @@ fn check_send() {
     });
     fn f(_: impl Send) {}
     f(iter);
+}
+
+#[test]
+fn ret_not_sync() {
+    let iter = Iter::new(|mut y| async move {
+        y.ret(Cell::new(1)).await;
+    });
+    let list: Vec<_> = iter.collect();
+    assert_eq!(list, vec![Cell::new(1)]);
 }
