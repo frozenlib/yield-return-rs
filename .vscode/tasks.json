@@ -5,8 +5,6 @@
   "options": {
     "env": {
       // "RUST_BACKTRACE": "1",
-      // "RUSTFLAGS": "--cfg procmacro2_semver_exempt",
-      // "CARGO_TARGET_DIR": "Z:/temporary/target_dirs/${workspaceFolderBasename}/target/",
     },
   },
   "presentation": {
@@ -15,23 +13,12 @@
   },
   "tasks": [
     {
+      // Needed for run (F5)
       "type": "shell",
       "label": "cargo build",
       "command": "cargo",
       "args": [
         "build"
-      ],
-      "problemMatcher": [
-        "$rustc"
-      ],
-    },
-    {
-      "type": "shell",
-      "label": "cargo build release",
-      "command": "cargo",
-      "args": [
-        "build",
-        "--release"
       ],
       "problemMatcher": [
         "$rustc"
@@ -52,25 +39,36 @@
         "isDefault": true
       },
       "dependsOn": [
-        "include doc"
+        "rustdoc-include"
       ],
     },
     {
       "type": "shell",
       "label": "cargo watch test",
-      "command": "wt",
+      "command": "cargo-watch",
       "args": [
-        "new-tab",
-        "cargo-watch",
         "-c",
         "-x",
         "test"
+        // "nextest run",
+        // "nextest run -p {project} --test {file} -- {module}",        
       ],
       "problemMatcher": [],
     },
     {
       "type": "shell",
       "label": "cargo watch run",
+      "command": "cargo-watch",
+      "args": [
+        "-c",
+        "-x",
+        "run",
+      ],
+      "problemMatcher": [],
+    },
+    {
+      "type": "shell",
+      "label": "cargo watch run with windows terminal",
       "command": "wt",
       "args": [
         "new-tab",
@@ -96,6 +94,15 @@
     },
     {
       "type": "shell",
+      "label": "watch example",
+      "command": "watchexec -c --restart -- cargo run --example ${fileBasenameNoExtension}",
+      "args": [],
+      "problemMatcher": [
+        "$rustc"
+      ],
+    },
+    {
+      "type": "shell",
       "label": "cargo doc open",
       "command": "cargo",
       "args": [
@@ -108,8 +115,24 @@
         "$rustc"
       ],
       "dependsOn": [
-        "include doc"
+        "rustdoc-include"
       ],
+    },
+    {
+      "type": "shell",
+      "label": "cargo llvm-cov open",
+      "command": "cargo",
+      "args": [
+        "llvm-cov",
+        "--open",
+      ],
+      "problemMatcher": [
+        "$rustc"
+      ],
+      "presentation": {
+        "panel": "dedicated",
+        "clear": true
+      },
     },
     {
       "type": "shell",
@@ -118,28 +141,7 @@
       "args": [
         "clippy",
         "--all-features",
-        "--tests",
-        "--lib",
-        "--",
-        "-W",
-        "clippy::all"
-      ],
-      "problemMatcher": [
-        "$rustc"
-      ],
-    },
-    {
-      "type": "shell",
-      "label": "cargo clippy nightly",
-      "command": "cargo",
-      "args": [
-        "+nightly",
-        "clippy",
-        "--target-dir",
-        "target/debug-nightly",
-        "--all-features",
-        "--tests",
-        "--lib",
+        "--all-targets",
         "--",
         "-W",
         "clippy::all"
@@ -151,7 +153,8 @@
     {
       "type": "shell",
       "label": "cargo fix & fmt",
-      "command": "cargo fix && cargo clippy --fix --allow-dirty && cargo fmt",
+      "command": "cargo fix --all-features --all-targets --allow-dirty && cargo clippy --fix --allow-dirty --all-features --all-targets && cargo fmt",
+      "args": [],
       "problemMatcher": [
         "$rustc"
       ],
@@ -206,14 +209,24 @@
     },
     {
       "type": "shell",
-      "label": "include doc",
-      "command": "include-doc",
+      "label": "check msrv",
+      "command": "cargo hack test --rust-version --workspace --all-targets --ignore-private",
+      "args": [],
+      "problemMatcher": [
+        "$rustc"
+      ],
+    },
+    {
+      "type": "shell",
+      "label": "rustdoc-include",
+      "command": "rustdoc-include",
       "args": [
+        "--root",
         "${workspaceFolder}"
       ],
       "problemMatcher": [
         {
-          "owner": "include-doc",
+          "owner": "rustdoc-include",
           "fileLocation": [
             "relative",
             "${workspaceFolder}"
@@ -234,5 +247,5 @@
         },
       ],
     },
-  ]
+  ],
 }
