@@ -99,10 +99,10 @@ async fn no_await_2() {
 }
 
 #[test]
-fn check_sync_send() {
+fn check_send() {
     let iter = AsyncIter::new(|mut y| async move {
         y.ret(1).await;
     });
-    fn f(_: impl Send + Sync) {}
+    fn f(_: impl Send) {}
     f(iter);
 }

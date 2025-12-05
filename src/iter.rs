@@ -48,7 +48,7 @@ where
     }
 
     /// Yields all values from an iterator. Similar to Python's `yield from` or JavaScript's `yield*`.
-    pub async fn ret_iter(&mut self, iter: impl IntoIterator<Item = T> + Send + Sync) {
+    pub async fn ret_iter(&mut self, iter: impl IntoIterator<Item = T> + Send) {
         for value in iter {
             self.ret(value).await;
         }
@@ -57,7 +57,7 @@ where
 
 struct Data<'a, T> {
     value: Arc<Mutex<Option<T>>>,
-    fut: Option<Pin<Box<dyn Future<Output = ()> + Send + Sync + 'a>>>,
+    fut: Option<Pin<Box<dyn Future<Output = ()> + Send + 'a>>>,
 }
 impl<T> Data<'_, T> {
     fn poll_next(&mut self, cx: &mut Context) -> Poll<Option<T>> {
@@ -104,12 +104,12 @@ impl<'a, T: 'a + Send> Iter<'a, T> {
     /// let list: Vec<_> = iter.collect();
     /// assert_eq!(list, vec![1, 2]);
     /// ```
-    pub fn new<Fut: Future<Output = ()> + Send + Sync + 'a>(
+    pub fn new<Fut: Future<Output = ()> + Send + 'a>(
         f: impl FnOnce(IterContext<T>) -> Fut,
     ) -> Self {
         let value = Arc::new(Mutex::new(None));
         let cx = IterContext(Sender(value.clone()));
-        let fut: Pin<Box<dyn Future<Output = ()> + Send + Sync + 'a>> = Box::pin(f(cx));
+        let fut: Pin<Box<dyn Future<Output = ()> + Send + 'a>> = Box::pin(f(cx));
         let fut = Some(fut);
         Self(Data { value, fut })
     }
@@ -159,7 +159,7 @@ impl<T> DerefMut for AsyncIterContext<T> {
 /// This type implements `Send`.
 pub struct AsyncIter<'a, T>(Iter<'a, T>);
 
-impl<'a, T: Send + 'a> AsyncIter<'a, T> {
+impl<'a, T: Send + Sync + 'a> AsyncIter<'a, T> {
     /// Create a stream from an asynchronous function.
     ///
     /// # Example
