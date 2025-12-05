@@ -113,6 +113,14 @@ impl<'a, T: 'a + Send> Iter<'a, T> {
         let fut = Some(fut);
         Self(Data { value, fut })
     }
+
+    #[allow(clippy::should_implement_trait)]
+    pub fn from_iter<I>(iter: impl IntoIterator<Item = T, IntoIter: Send + 'a>) -> Self {
+        let iter = iter.into_iter();
+        Self::new(|mut cx| async move {
+            cx.ret_iter(iter).await;
+        })
+    }
 }
 
 impl<T> Iterator for Iter<'_, T> {
@@ -159,7 +167,7 @@ impl<T> DerefMut for AsyncIterContext<T> {
 /// This type implements `Send`.
 pub struct AsyncIter<'a, T>(Iter<'a, T>);
 
-impl<'a, T: Send + Sync + 'a> AsyncIter<'a, T> {
+impl<'a, T: Send + 'a> AsyncIter<'a, T> {
     /// Create a stream from an asynchronous function.
     ///
     /// # Example
@@ -174,10 +182,18 @@ impl<'a, T: Send + Sync + 'a> AsyncIter<'a, T> {
     /// assert_eq!(list, vec![1, 2]);
     /// # });
     /// ```
-    pub fn new<Fut: Future<Output = ()> + Send + Sync + 'a>(
-        f: impl FnOnce(AsyncIterContext<T>) -> Fut + Send + Sync,
+    pub fn new<Fut: Future<Output = ()> + Send + 'a>(
+        f: impl FnOnce(AsyncIterContext<T>) -> Fut + Send,
     ) -> Self {
         Self(Iter::new(|cx| f(AsyncIterContext(cx))))
+    }
+
+    #[allow(clippy::should_implement_trait)]
+    pub fn from_iter<I>(iter: impl IntoIterator<Item = T, IntoIter: Send + 'a>) -> Self {
+        let iter = iter.into_iter();
+        Self::new(|mut cx| async move {
+            cx.ret_iter(iter).await;
+        })
     }
 }
 

@@ -108,6 +108,14 @@ impl<'a, T: 'a> LocalIter<'a, T> {
         let fut = Some(fut);
         Self(Data { value, fut })
     }
+
+    #[allow(clippy::should_implement_trait)]
+    pub fn from_iter(iter: impl IntoIterator<Item = T, IntoIter: 'a>) -> Self {
+        let iter = iter.into_iter();
+        Self::new(|mut cx| async move {
+            cx.ret_iter(iter).await;
+        })
+    }
 }
 
 impl<T> Iterator for LocalIter<'_, T> {
@@ -172,6 +180,14 @@ impl<'a, T: 'a> LocalAsyncIter<'a, T> {
         f: impl FnOnce(LocalAsyncIterContext<T>) -> Fut,
     ) -> Self {
         Self(LocalIter::new(|cx| f(LocalAsyncIterContext(cx))))
+    }
+
+    #[allow(clippy::should_implement_trait)]
+    pub fn from_iter(iter: impl IntoIterator<Item = T, IntoIter: 'a>) -> Self {
+        let iter = iter.into_iter();
+        Self::new(|mut cx| async move {
+            cx.ret_iter(iter).await;
+        })
     }
 }
 
